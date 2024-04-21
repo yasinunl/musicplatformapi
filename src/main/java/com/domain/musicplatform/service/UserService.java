@@ -13,10 +13,7 @@ import com.domain.musicplatform.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -113,5 +110,19 @@ public class UserService {
             optional.ifPresent(value -> theUser.getFavorites().remove(value));
         }
         return userRepo.save(theUser);
+    }
+
+    public User login(User user) {
+        if(Objects.equals(user.getEmail(), "") & Objects.equals(user.getPassword(), ""))
+            throw new BadExceptionHandler("Email and password can't be empty!");
+        Optional<User> optional = userRepo.getUserByEmailAndPassword(user.getPassword(),user.getEmail());
+        if(optional.isEmpty())
+            throw new BadExceptionHandler("Email or password is wrong");
+        return optional.get();
+    }
+    public User register(User user) {
+        if(Objects.equals(user.getEmail(), "") || Objects.equals(user.getPassword(), "") || Objects.equals(user.getUsername(), ""))
+            throw new BadExceptionHandler("Email and password can't be empty!");
+        return userRepo.save(user);
     }
 }

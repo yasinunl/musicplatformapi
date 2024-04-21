@@ -55,4 +55,12 @@ public class UserController {
     ResponseEntity<User> deleteFavoriteSong(@RequestBody User user){
         return ResponseEntity.ok(userService.deleteFavoriteSong(user));
     }
+    @PostMapping("/login")
+    ResponseEntity<User> login(@RequestBody User user){
+        return ResponseEntity.ok(userService.login(user));
+    }
+    @PostMapping("/register")
+    ResponseEntity<User> register(@RequestBody User user){
+        return ResponseEntity.ok(userService.register(user));
+    }
 }

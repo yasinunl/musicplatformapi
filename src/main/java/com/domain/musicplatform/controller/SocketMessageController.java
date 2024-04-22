@@ -19,19 +19,26 @@ public class SocketMessageController {
     @MessageMapping("/play")
     public void play(@Payload String message, @Header("sessionID") String sessionId) {
         synchronized (playbackSessions) {
+            // If email is already exist, it turns the session
             String previousSessionId = playbackSessions.get(message);
+
+            // To send stop message to the previous session's music player of client
             if (previousSessionId != null) {
                 messagingTemplate.convertAndSend("/queue/reply-" + previousSessionId,
                         "paused");
+                // Send message about other client's music player to new client
                 messagingTemplate.convertAndSend("/queue/reply-" + sessionId,
                         "paused message");
-                playbackSessions.remove(message);
+                playbackSessions.remove(message); // Other client is deleting to put new client
+                // We can delete it because no need to it anymore.
             }
             playbackSessions.put(message, sessionId);
         }
+        // It is not necessary but as you see you can send new message, it's going to turn anyway
         messagingTemplate.convertAndSend("/queue/reply-" + sessionId,
                 "played");
     }
+    // If client stops to listen, we should remove it from playback
     @MessageMapping("/pause")
     public void pause(@Payload String message, @Header("sessionID") String sessionId) {
         playbackSessions.remove(message);
